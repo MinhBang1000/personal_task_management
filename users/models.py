@@ -37,6 +37,6 @@ class User(AbstractUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
 class ResetCode(models.Model):
-    reset_code = models.CharField(max_length=6)
+    reset_code = models.CharField(max_length=64)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reset_codes")
     created = models.DateTimeField(auto_now_add=True)
