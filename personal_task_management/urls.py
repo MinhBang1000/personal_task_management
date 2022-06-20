@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include("users.api.urls")),
     path('workspaces/', include("workspaces.api.urls")),
+    path('workspaces/<int:workspace_id>/', include("tasks.api.urls")),
 ]
