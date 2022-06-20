@@ -1,21 +1,32 @@
-from xml.dom import NotFoundErr
+from re import X
+from xml.dom import ValidationErr
 from django.conf import settings
 from django.forms import ValidationError
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import RegisterSerializer, ResetCodeSerializer
+from .serializers import RegisterSerializer, ResetCodeSerializer, ProfileSerializer, UserSerializer, UserUpdateSerializer, UserPasswordChange
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework import status,permissions
+from rest_framework import status,permissions, generics, mixins
 from django.core.mail import send_mail
 import hashlib
-from users.models import User, ResetCode
+from users.models import User, ResetCode, Profile
 from django.template.loader import render_to_string
+
 
 @api_view(["POST"])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user_created = serializer.save()
+        user_created.full_name = request.data["full_name"]
+        user_created.save()
+
+        # Create a profile with the user
+        profile_serializer = ProfileSerializer(data={"owner":user_created.id})
+        if not profile_serializer.is_valid(raise_exception=True):
+            return Response(status=status.HTTP_400_BAD_REQUEST) 
+        profile_serializer.save()
+
         refresh = RefreshToken.for_user(user_created)
         return Response(data={
             "email":user_created.email,
@@ -23,6 +34,30 @@ def register(request):
             "access":str(refresh.access_token)    
         }, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class UserGenericView(generics.RetrieveUpdateAPIView):
+    permission_classes=[permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user 
+
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return UserSerializer
+        return UserUpdateSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)  
+        data = {
+            "email": response.data["email"],
+            "full_name": response.data["full_name"]
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
@@ -74,4 +109,12 @@ def reset_password(request):
     user.set_password(password)
     user.save()
     return Response(data={"message":"User password has changed!"}, status=status.HTTP_205_RESET_CONTENT)
-    
+
+@api_view(["PUT"])
+@permission_classes([permissions.IsAuthenticated])
+def change_password(request):
+    user = request.user
+    serializer = UserPasswordChange(user, request.data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(data={"message":"Password had changed!"},status=status.HTTP_200_OK)

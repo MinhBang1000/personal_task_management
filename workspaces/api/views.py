@@ -6,7 +6,9 @@ from workspaces.models import Workspace
 # Create your views here.
 class WorkspaceViewSet(ModelViewSet):
     permission_classes=[permissions.IsAuthenticated]
-    queryset=Workspace.objects.all()
+    
+    def get_queryset(self):
+        return Workspace.objects.filter(owner=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method == "GET":
