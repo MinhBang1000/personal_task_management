@@ -1,5 +1,3 @@
-from re import X
-from xml.dom import ValidationErr
 from django.conf import settings
 from django.forms import ValidationError
 from rest_framework.decorators import api_view, permission_classes
@@ -9,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status,permissions, generics, mixins
 from django.core.mail import send_mail
 import hashlib
-from users.models import User, ResetCode, Profile
+from users.models import User, ResetCode
 from django.template.loader import render_to_string
 
 
