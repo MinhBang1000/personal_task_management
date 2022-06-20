@@ -41,10 +41,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         exclude=["image"]
 
 class ProfileReadSerializer(serializers.ModelSerializer):
-
     class Meta:
         model=Profile
         exclude = ["owner"]
+        depth=1
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -77,7 +77,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             return instance
         raise ValidationError("This email have already exists!")
 
-class UserPasswordChange(serializers.Serializer):
+class UserPasswordChangeSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128)
     password_confirm = serializers.CharField(max_length=128)
 
@@ -90,3 +90,9 @@ class UserPasswordChange(serializers.Serializer):
         instance.set_password(validated_data["password"])
         instance.save()
         return instance
+
+class ProfileModeChangeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Profile
+        fields=["theme"]

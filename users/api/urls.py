@@ -1,6 +1,6 @@
 from django.urls import path 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import register, forgot_password,reset_password, logout, change_password, UserGenericView
+from .views import register, forgot_password,reset_password, logout, change_password, change_mode, UserGenericView
 
 urlpatterns = [ 
     path('login/', TokenObtainPairView.as_view(), name="login"),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('reset-password/', reset_password,  name="reset-password"),
     path('change-password/', change_password, name="change-password"),
     path('profile/', UserGenericView.as_view(), name="profile"),
+    path('profile/mode/', change_mode, name="change-mode"),
 ]

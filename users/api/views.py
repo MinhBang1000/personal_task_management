@@ -1,37 +1,15 @@
 from django.conf import settings
 from django.forms import ValidationError
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import RegisterSerializer, ResetCodeSerializer, ProfileSerializer, UserSerializer, UserUpdateSerializer, UserPasswordChange
+from .serializers import RegisterSerializer, ResetCodeSerializer, ProfileModeChangeSerializer, ProfileSerializer, UserSerializer, UserUpdateSerializer, UserPasswordChangeSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework import status,permissions, generics, mixins
+from rest_framework import status,permissions, generics
 from django.core.mail import send_mail
 import hashlib
 from users.models import User, ResetCode
 from django.template.loader import render_to_string
-
-
-@api_view(["POST"])
-def register(request):
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        user_created = serializer.save()
-        user_created.full_name = request.data["full_name"]
-        user_created.save()
-
-        # Create a profile with the user
-        profile_serializer = ProfileSerializer(data={"owner":user_created.id})
-        if not profile_serializer.is_valid(raise_exception=True):
-            return Response(status=status.HTTP_400_BAD_REQUEST) 
-        profile_serializer.save()
-
-        refresh = RefreshToken.for_user(user_created)
-        return Response(data={
-            "email":user_created.email,
-            "refresh":str(refresh),
-            "access":str(refresh.access_token)    
-        }, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class UserGenericView(generics.RetrieveUpdateAPIView):
     permission_classes=[permissions.IsAuthenticated]
@@ -55,6 +33,36 @@ class UserGenericView(generics.RetrieveUpdateAPIView):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
+@api_view(["POST"])
+def register(request):
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user_created = serializer.save()
+        user_created.full_name = request.data["full_name"]
+        user_created.save()
+
+        # Create a profile with the user
+        profile_serializer = ProfileSerializer(data={"owner":user_created.id})
+        if not profile_serializer.is_valid(raise_exception=True):
+            return Response(status=status.HTTP_400_BAD_REQUEST) 
+        profile_serializer.save()
+
+        refresh = RefreshToken.for_user(user_created)
+        return Response(data={
+            "email":user_created.email,
+            "refresh":str(refresh),
+            "access":str(refresh.access_token)    
+        }, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["PUT"])
+@permission_classes([permissions.IsAuthenticated])
+def change_mode(request):
+    serializer = ProfileModeChangeSerializer(request.user.profile, data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(data={"message":"You mode has changed!"}, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -112,7 +120,7 @@ def reset_password(request):
 @permission_classes([permissions.IsAuthenticated])
 def change_password(request):
     user = request.user
-    serializer = UserPasswordChange(user, request.data)
+    serializer = UserPasswordChangeSerializer(user, request.data)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
         return Response(data={"message":"Password had changed!"},status=status.HTTP_200_OK)

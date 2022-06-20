@@ -25,3 +25,11 @@ class TaskUpdateSerializer(serializers.ModelSerializer):
             "due_date",
             "priority"
         ]
+
+class TaskUpdateStatusSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Task
+        fields=[
+            "status"
+        ]

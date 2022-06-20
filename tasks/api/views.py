@@ -1,20 +1,27 @@
 from django.forms import ValidationError
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import permissions,status
+from rest_framework import permissions,status, filters
 from rest_framework.response import Response
 from workspaces.models import Workspace
 from tasks.models import Task
-from .serializers import TaskReadSerializer, TaskCreateSerializer, TaskUpdateSerializer
+from .serializers import TaskReadSerializer, TaskCreateSerializer, TaskUpdateSerializer, TaskUpdateStatusSerializer
+from tasks.api import permissions as custom_permissions
+from rest_framework.decorators import api_view, permission_classes
 
 # Create your views here.
 class TaskViewSet(ModelViewSet):
-    permission_classes=[permissions.IsAuthenticated]
+    permission_classes=[permissions.IsAuthenticated, custom_permissions.IsOwnerTask]
+    filterset_fields=["status__name"] 
+    filter_backends=[filters.SearchFilter]
+    search_fields = ['task_name']
 
     def get_serializer_class(self):
         if self.request.method == "GET":
             return TaskReadSerializer
         else:
             if self.request.method == "PUT":
+                if self.request.data.get("status"):
+                    return TaskUpdateStatusSerializer
                 return TaskUpdateSerializer
         return TaskCreateSerializer 
 
