@@ -5,6 +5,16 @@ from django.forms import ValidationError
 from rest_framework import serializers
 from users.models import User, ResetCode, Profile
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        print(response)
+        return response
+
 
 class RegisterSerializer(serializers.Serializer):
     full_name = serializers.CharField(max_length=50)

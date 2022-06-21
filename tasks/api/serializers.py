@@ -3,7 +3,9 @@ from tasks.models import Task
 from rest_framework import serializers
 
 class TaskReadSerializer(serializers.ModelSerializer):
-    
+    workspace = serializers.StringRelatedField()
+    priority = serializers.StringRelatedField()
+    status = serializers.StringRelatedField()
     class Meta:
         model=Task
         fields="__all__"

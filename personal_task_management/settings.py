@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'workspaces',
     'users',
     'django_filters',
+    'formats',
 ]
 
 MIDDLEWARE = [

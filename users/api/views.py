@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.forms import ValidationError
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import RegisterSerializer, ResetCodeSerializer, ProfileModeChangeSerializer, ProfileSerializer, UserSerializer, UserUpdateSerializer, UserPasswordChangeSerializer
+from .serializers import RegisterSerializer, MyTokenObtainPairSerializer, ResetCodeSerializer, ProfileModeChangeSerializer, ProfileSerializer, UserSerializer, UserUpdateSerializer, UserPasswordChangeSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework import status,permissions, generics
@@ -10,6 +10,15 @@ import hashlib
 from users.models import User, ResetCode
 from django.template.loader import render_to_string
 from rest_framework_simplejwt.views import TokenObtainPairView
+from formats.formats import success, error
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+    
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        response.data = success(data=response.data, code=200, message="Login Successful!")
+        return response
 
 class UserGenericView(generics.RetrieveUpdateAPIView):
     permission_classes=[permissions.IsAuthenticated]
@@ -48,11 +57,11 @@ def register(request):
         profile_serializer.save()
 
         refresh = RefreshToken.for_user(user_created)
-        return Response(data={
+        return Response(data=success(data={
             "email":user_created.email,
             "refresh":str(refresh),
             "access":str(refresh.access_token)    
-        }, status=status.HTTP_201_CREATED)
+        }, code=201, message="Register Successful!"), status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -98,23 +107,23 @@ def forgot_password(request):
     try:
         send_mail(subject=subject, message=message, html_message=html_message, recipient_list=receivers, from_email=email_from)
     except Exception:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    return Response(data={"message":"Reset code had sent!", "reset_code": reset_code}, status=status.HTTP_200_OK)
+        return Response(data=error(400, "Can't send this mail!"),status=status.HTTP_400_BAD_REQUEST)
+    return Response(data=success(data={"reset_code": reset_code}, code=200, message="Verify password has sent!"), status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 def reset_password(request):
     try:
         reset_code_obj = ResetCode.objects.get(reset_code=request.data["reset_code"])
     except ResetCode.DoesNotExist:
-        return Response(data={"message":"Given reset code doesn't exists!"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(data=error(code=404, message="Given reset code doesn't exists!"), status=status.HTTP_404_NOT_FOUND)
     user = reset_code_obj.user
     password = request.data["password"]
     password_confirm = request.data["password_confirm"]
     if password!=password_confirm:
-        return Response(data={"message":"Given password and confirm aren't match!"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data=error(code=400, message="Given password and confirm aren't match!"), status=status.HTTP_400_BAD_REQUEST)
     user.set_password(password)
     user.save()
-    return Response(data={"message":"User password has changed!"}, status=status.HTTP_205_RESET_CONTENT)
+    return Response(data=success(code=200, message="User password has changed!"), status=status.HTTP_205_RESET_CONTENT)
 
 @api_view(["PUT"])
 @permission_classes([permissions.IsAuthenticated])
@@ -123,4 +132,4 @@ def change_password(request):
     serializer = UserPasswordChangeSerializer(user, request.data)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
-        return Response(data={"message":"Password had changed!"},status=status.HTTP_200_OK)
+        return Response(data=success(code=200, message="Password has changed!"),status=status.HTTP_200_OK)

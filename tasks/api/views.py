@@ -1,4 +1,5 @@
 from django.forms import ValidationError
+from requests import delete
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import permissions,status, filters
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from tasks.models import Task
 from .serializers import TaskReadSerializer, TaskCreateSerializer, TaskUpdateSerializer, TaskUpdateStatusSerializer
 from tasks.api import permissions as custom_permissions
 from rest_framework.decorators import api_view, permission_classes
+from formats.formats import success, error
 
 # Create your views here.
 class TaskViewSet(ModelViewSet):
@@ -45,7 +47,21 @@ class TaskViewSet(ModelViewSet):
         instance = self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         read_serializer = TaskReadSerializer(instance)
-        return Response(read_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(data=success(data=read_serializer.data, code=200, message="Create Task Successful!"), status=status.HTTP_201_CREATED, headers=headers)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        response.data = success(data=response.data, code=200, message="List Task Successful!")
+        return response
+
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        response.data = success(data=response.data, code=200, message="Retrieve Task Successful!")
+        return response
+
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response(data=success(data=None, code=204, message="Remove Task Successful!"),status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -60,4 +76,4 @@ class TaskViewSet(ModelViewSet):
             instance._prefetched_objects_cache = {}
 
         read_serializer = TaskReadSerializer(instance)
-        return Response(read_serializer.data, status=status.HTTP_200_OK)
+        return Response(data=success(data=read_serializer.data, code=200, message="Update Task Successful!"), status=status.HTTP_200_OK)
