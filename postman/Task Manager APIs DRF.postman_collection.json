@@ -1,0 +1,1228 @@
+{
+	"info": {
+		"_postman_id": "2c5b62ba-63ce-4d57-be78-fff45bbe3c0a",
+		"name": "Task Manager APIs DRF",
+		"description": "APIs\n\n1.  Login\n2.  Register\n3.  1\n4.  Forget  \n    5,6. Create Workspace  \n    7,8. Upload avatar, Create Task\n5.  List Today Task\n6.  Empty Task: Create task, List task  \n    11, 12, 13, 14, 15. Have Task: Create task, List task, Filter List Task (4 hay là 1 Trả về tất cả frontend tự bắt)  \n    16: Task Detail, Update (Có 2 option 1: Status, 2: Toàn phần trừ Status), Delete  \n    17, 18. Setting Profile, Edit Themes, Profile Detail, Edit Profile, Logout\n    \n\n8 18: Create Workspace",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16430918"
+	},
+	"item": [
+		{
+			"name": "Authenication JWT",
+			"item": [
+				{
+					"name": "Retrieve Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/auth/profile/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()\r",
+									"pm.environment.set(\"TOKEN\",response.data.access)\r",
+									"pm.environment.set(\"REFRESH\",response.data.refresh)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "bangb1805845@student.ctu.edu.vn",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "leminhbang",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/login/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "refresh",
+									"value": "{{REFRESH}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/logout/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"logout",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()\r",
+									"pm.environment.set(\"TOKEN\", response.access)\r",
+									"pm.environment.set(\"REFRESH\", response.refresh)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "refresh",
+									"value": "{{REFRESH}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/refresh/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()\r",
+									"pm.environment.set(\"TOKEN\",response.data.access)\r",
+									"pm.environment.set(\"REFRESH\",response.data.refresh)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "full_name",
+									"value": "Lê Minh Bằng",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "bradonleminhbang1@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "motoboro123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/register/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "bradonleminhbang1@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/forgot-password/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "password",
+									"value": "motoboro456",
+									"type": "text"
+								},
+								{
+									"key": "password_confirm",
+									"value": "motoboro456",
+									"type": "text"
+								},
+								{
+									"key": "reset_code",
+									"value": "8343bdd1777c0c8d25701dbf1b34b39edca099a2e2518023618f87c7bdda5ae9",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/reset-password/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"reset-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change password",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "password",
+									"value": "leminhbang",
+									"type": "text"
+								},
+								{
+									"key": "password_confirm",
+									"value": "leminhbang",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/change-password/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"change-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "full_name",
+									"value": "Lê Minh Bằng",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "bangb1805845@student.ctu.edu.vn",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/profile/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change mode",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "theme",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/auth/profile/mode/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"auth",
+								"profile",
+								"mode",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Workspaces",
+			"item": [
+				{
+					"name": "List Workspace",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/workspaces/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Workspace",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Workspace",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Dinosaur Project Workspace",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "This is research project about many dinosaurs in the world",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/workspaces/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update (Only Workspace Avatar)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/F:/Thực tập/Dinosaur Images/dinosaurs-tyrannosaurus_00336745_13a8.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "List Task",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/tasks/?due_date=2022-07-10T03:00:00Z",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								"tasks",
+								""
+							],
+							"query": [
+								{
+									"key": "status__name",
+									"value": "In Progress",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Task 1",
+									"disabled": true
+								},
+								{
+									"key": "due_date",
+									"value": "2022-07-10T03:00:00Z"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Task",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/tasks/8/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								"tasks",
+								"8",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Task",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "task_name",
+									"value": "Design Pattern",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Design first pattern for this project base on the requirement which has collected in previous step",
+									"type": "text"
+								},
+								{
+									"key": "due_date",
+									"value": "2022-07-10 03:00:00",
+									"type": "text"
+								},
+								{
+									"key": "priority",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/tasks/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								"tasks",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Task",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "task_name",
+									"value": "Dinosaur Project Workspace",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "This is a task 1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "due_date",
+									"value": "2022-07-28 03:00:00",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "priority",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/tasks/8/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								"tasks",
+								"8",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Only Status",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "status",
+									"value": "3",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/workspaces/13/tasks/8/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"13",
+								"tasks",
+								"8",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Destroy Task",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/workspaces/11/tasks/5/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"workspaces",
+								"11",
+								"tasks",
+								"5",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Themes",
+			"item": [
+				{
+					"name": "List Theme",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/themes/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"themes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Theme",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/themes/1/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"themes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Theme",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Pink Mode",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/themes/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"themes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Theme",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Pink Mode",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/themes/3/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"themes",
+								"3",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Destroy Theme",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/themes/4/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"themes",
+								"4",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Status",
+			"item": [
+				{
+					"name": "List Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/status/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"status",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Status",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Create Status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Testing status",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/status/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"status",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Status",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/status/4/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"status",
+								"4",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Destroy Status",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/status/4/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"status",
+								"4",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Priorities",
+			"item": [
+				{
+					"name": "List Priority",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/priorities/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"priorities",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Priority",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/priorities/1/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"priorities",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Priority",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Additional",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/priorities/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"priorities",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Priority",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Less Important",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE}}/priorities/1/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"priorities",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Destroy Priority",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BASE}}/priorities/5/",
+							"host": [
+								"{{BASE}}"
+							],
+							"path": [
+								"priorities",
+								"5",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{TOKEN}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}

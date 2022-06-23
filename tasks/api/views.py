@@ -13,9 +13,9 @@ from formats.formats import success, error
 # Create your views here.
 class TaskViewSet(ModelViewSet):
     permission_classes=[permissions.IsAuthenticated, custom_permissions.IsOwnerTask]
-    filterset_fields=["status__name","created","due_date"]
-    # filter_backends=[filters.SearchFilter]
-    # search_fields = ['task_name']
+    filterset_fields=["status__name","due_date"]
+    filter_backends=[filters.SearchFilter]
+    search_fields = ['task_name']
 
     def get_serializer_class(self):
         if self.request.method == "GET":
