@@ -13,9 +13,9 @@ from formats.formats import success, error
 # Create your views here.
 class TaskViewSet(ModelViewSet):
     permission_classes=[permissions.IsAuthenticated, custom_permissions.IsOwnerTask]
-    filterset_fields=["status__name"] 
-    filter_backends=[filters.SearchFilter]
-    search_fields = ['task_name']
+    filterset_fields=["status__name","created","due_date"]
+    # filter_backends=[filters.SearchFilter]
+    # search_fields = ['task_name']
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -66,7 +66,7 @@ class TaskViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 

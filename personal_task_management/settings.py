@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'tasks',
     'workspaces',
     'users',
+    'themes',
+    'status',
+    'priorities',
     'django_filters',
     'formats',
 ]

@@ -21,4 +21,7 @@ urlpatterns = [
     path('auth/', include("users.api.urls")),
     path('workspaces/', include("workspaces.api.urls")),
     path('workspaces/<int:workspace_id>/', include("tasks.api.urls")),
+    path('themes/', include('themes.api.urls')),
+    path('status/', include('status.api.urls')),
+    path('priorities/', include('priorities.api.urls')),
 ]

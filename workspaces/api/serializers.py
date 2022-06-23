@@ -23,9 +23,11 @@ class WorkspaceListSerializer(serializers.ModelSerializer):
     # Only all fields of Workspace model
 
 class TaskSerializer(serializers.ModelSerializer):
+    priority = serializers.StringRelatedField(read_only=True)
+    status = serializers.StringRelatedField(read_only=True)
     class Meta:
         model=Task
-        fields=["id", "task_name"]
+        exclude=["workspace"]
     # This serializer is used below
 
 class WorkspaceDetailSerializer(serializers.ModelSerializer):
