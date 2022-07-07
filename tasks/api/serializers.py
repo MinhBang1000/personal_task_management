@@ -1,37 +1,30 @@
-from asyncio import tasks
-from tasks.models import Task
+from tasks.models import Task,Priority, Status
 from rest_framework import serializers
+from status.api.serializers import StatusSerializer
+from priorities.api.serializers import PrioritySerializer 
 
-class TaskReadSerializer(serializers.ModelSerializer):
-    workspace = serializers.StringRelatedField()
-    priority = serializers.StringRelatedField()
-    status = serializers.StringRelatedField()
-    class Meta:
-        model=Task
-        fields="__all__"
-        depth=1
+class TaskSerializer(serializers.ModelSerializer):
 
-class TaskCreateSerializer(serializers.ModelSerializer):
+    priority_id = serializers.PrimaryKeyRelatedField(
+        queryset=Priority.objects.all(), source="priority", write_only=True
+    )
+    status_id = serializers.PrimaryKeyRelatedField(
+        queryset=Status.objects.all(), source="status", write_only=True
+    )
+    status = StatusSerializer(read_only=True)
+    priority = PrioritySerializer(read_only=True)
 
-    class Meta:
-        model=Task
-        exclude=["workspace"]
-
-class TaskUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=Task
         fields=[
+            "id",
+            "priority",
+            "priority_id",
+            "status",
+            "status_id",
             "task_name",
             "description",
             "due_date",
-            "priority"
-        ]
-
-class TaskUpdateStatusSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model=Task
-        fields=[
-            "status"
+            "created"
         ]

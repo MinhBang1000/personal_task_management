@@ -14,11 +14,6 @@ from formats.formats import success, error
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-    
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        response.data = success(data=response.data, code=200, message="Login Successful!")
-        return response
 
 class UserGenericView(generics.RetrieveUpdateAPIView):
     permission_classes=[permissions.IsAuthenticated]
@@ -57,11 +52,11 @@ def register(request):
         profile_serializer.save()
 
         refresh = RefreshToken.for_user(user_created)
-        return Response(data=success(data={
+        return Response(data={
             "email":user_created.email,
             "refresh":str(refresh),
             "access":str(refresh.access_token)    
-        }, code=201, message="Register Successful!"), status=status.HTTP_201_CREATED)
+        }, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -71,7 +66,7 @@ def change_mode(request):
     serializer = ProfileModeChangeSerializer(request.user.profile, data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    return Response(data={"message":"You mode has changed!"}, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -108,7 +103,7 @@ def forgot_password(request):
         send_mail(subject=subject, message=message, html_message=html_message, recipient_list=receivers, from_email=email_from)
     except Exception:
         return Response(data=error(400, "Can't send this mail!"),status=status.HTTP_400_BAD_REQUEST)
-    return Response(data=success(data={"reset_code": reset_code}, code=200, message="Verify password has sent!"), status=status.HTTP_200_OK)
+    return Response(data={"reset_code": reset_code}, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 def reset_password(request):
@@ -123,7 +118,7 @@ def reset_password(request):
         return Response(data=error(code=400, message="Given password and confirm aren't match!"), status=status.HTTP_400_BAD_REQUEST)
     user.set_password(password)
     user.save()
-    return Response(data=success(code=200, message="User password has changed!"), status=status.HTTP_205_RESET_CONTENT)
+    return Response(status=status.HTTP_205_RESET_CONTENT)
 
 @api_view(["PUT"])
 @permission_classes([permissions.IsAuthenticated])
@@ -132,4 +127,4 @@ def change_password(request):
     serializer = UserPasswordChangeSerializer(user, request.data)
     if serializer.is_valid(raise_exception=True):
         serializer.save()
-        return Response(data=success(code=200, message="Password has changed!"),status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
